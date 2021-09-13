@@ -32,6 +32,11 @@ class Presupuesto {
         const gastado = this.gastos.reduce((total, gasto) =>  total + gasto.cantidad, 0);
         this.restante = this.presupuesto - gastado;
     }
+
+    eliminarGasto(id) {
+        this.gastos = this.gastos.filter((gasto) => gasto.id !== id ); 
+        this.calcularRestante();       
+    }
 }
 
 class UI {
@@ -67,7 +72,7 @@ class UI {
         }, 2000)
     }
 
-    agregarGastoListado(gastos) {
+    mostrarGastos(gastos) {
 
         this.limpiarHTML(); //Elimina el HTML previo
 
@@ -88,7 +93,10 @@ class UI {
             // Botón para borrar el gasto
             const btnBorrar = document.createElement('button');
             btnBorrar.classList.add('btn', 'btn-danger', 'borrar-gasto');     
-            btnBorrar.innerHTML = 'Borrar &times';       
+            btnBorrar.innerHTML = 'Borrar &times';    
+            btnBorrar.onclick = () => {
+                eliminarGasto(id);
+            }; 
             nuevoGasto.appendChild(btnBorrar);
 
             // Agregar al HTML
@@ -118,6 +126,9 @@ class UI {
         } else if ((presupuesto / 2) > restante) {
             restanteDiv.classList.remove('alert-success');
             restanteDiv.classList.add('alert-warning');
+        } else {
+            restanteDiv.classList.remove('alert-danger', 'alert-warning');
+            restanteDiv.classList.add('alert-success');
         }
 
         // Si el total es 0 o menor
@@ -179,7 +190,7 @@ function agregarGasto(e) {
 
     // Imprimir los gastos
     const { gastos, restante } = presupuesto;
-    ui.agregarGastoListado(gastos);
+    ui.mostrarGastos(gastos);
 
     ui.actualizarRestante(restante);
 
@@ -189,4 +200,16 @@ function agregarGasto(e) {
     formulario.reset();
 
 
+}
+
+
+function eliminarGasto(id) {
+    // Elimina los gastos del Objeto
+    presupuesto.eliminarGasto(id);
+
+    // Elimina los gastos del HTML
+    const { gastos, restante } = presupuesto;
+    ui.mostrarGastos(gastos)
+    ui.actualizarRestante(restante);
+    ui.comprobarPresupuesto(presupuesto);
 }
